@@ -366,10 +366,10 @@ module TypeScheme = struct
         t
       else
         match t with
-        | Arrow (lv, l, r) ->
-          Arrow (lv, freshen l, freshen r)
-        | Record (lv, fs) ->
-          Record (lv, fs |> List.map (fun (n, t) -> (n, freshen t)))
+        | Arrow (_, l, r) ->
+          SimpleType.arrow (freshen l) (freshen r)
+        | Record (_, fs) ->
+          SimpleType.record (fs |> List.map (fun (n, t) -> (n, freshen t)))
         | Primitive _ as t ->
           t
         | TyVar r ->
