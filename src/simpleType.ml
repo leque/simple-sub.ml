@@ -23,13 +23,11 @@ let pp_tv ppf { uid; level; _ } =
 
 let pp ppf t =
   let maybe_paren b f =
-    begin if b then
-        Format.fprintf ppf "("
-    end;
+    if b then
+        Format.fprintf ppf "(";
     f ();
-    begin if b then
+    if b then
         Format.fprintf ppf ")"
-    end;
   in
   let none_prec = 0 in
   let fun_prec = 1 in
@@ -42,9 +40,8 @@ let pp ppf t =
     | Record (_, fs) ->
       Format.fprintf ppf "{";
       fs |> List.iteri (fun i (n, t) ->
-          begin if i > 0 then
-              Format.fprintf ppf ", "
-          end;
+          if i > 0 then
+              Format.fprintf ppf ", ";
           Format.fprintf ppf "%s: " n;
           recur none_prec t
         );

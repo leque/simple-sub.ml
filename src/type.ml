@@ -41,13 +41,11 @@ let intersection_prec = 25
 let rec_prec = 31
 
 let maybe_paren ppf b f =
-  begin if b then
-      Format.fprintf ppf "("
-  end;
+  if b then
+      Format.fprintf ppf "(";
   f ();
-  begin if b then
+  if b then
       Format.fprintf ppf ")"
-  end
 
 let rec pp_in ppf ctx outer_prec = function
   | Top -> Format.fprintf ppf "⊤"
@@ -68,9 +66,8 @@ let rec pp_in ppf ctx outer_prec = function
   | Record fs ->
     Format.fprintf ppf "{";
     fs |> List.iteri (fun i (n, t) ->
-        begin if i > 0 then
-            Format.fprintf ppf ", "
-        end;
+        if i > 0 then
+            Format.fprintf ppf ", ";
         Format.fprintf ppf "%s: " n;
         pp_in ppf ctx 0 t;
       );

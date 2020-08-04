@@ -446,53 +446,52 @@ let expand_compact_type cty =
       in
       let in_process = PCtyMap.add { ty; polarity } v in_process in
       let res =
-        begin match ty with
-          | CtyOrVar.TyVar tv ->
-            begin match TyVarMap.find_opt tv cty.CompactTypeScheme.rec_vars with
-              | None ->
-                Type.TyVar (tv_of_tyvar tv)
-              | Some t ->
-                go_cty t polarity in_process
-            end
-          | CtyOrVar.Cty { vars; prims; record; fun_ } ->
-            let extr, merge =
-              match polarity with
-              | Polarity.Positive ->
-                Type.Bot, (fun x y -> Type.Union (x, y))
-              | Polarity.Negative ->
-                Type.Top, (fun x y -> Type.Intersection (x, y))
-            in
-            let vs = vars
-                     |> TyVarSet.to_seq
-                     |> Seq.map (fun v -> go (CtyOrVar.TyVar v) polarity in_process)
-                     |> List.of_seq
-            in
-            let ps = prims
-                     |> StringSet.to_seq
-                     |> Seq.map (fun n -> Type.Primitive n)
-                     |> List.of_seq
-            in
-            let rs = record
-                     |> Option.map (fun fs ->
-                         fs
-                         |> StringMap.to_seq
-                         |> Seq.map (fun (n, t) -> (n, go_cty t polarity in_process))
-                         |> List.of_seq
-                         |> (fun x -> Type.Record x))
-                     |> Option.to_list
-            in
-            let fs = fun_
-                     |> Option.map (fun (l, r) ->
-                         Type.Arrow
-                           ( go_cty l (Polarity.negate polarity) in_process
-                           , go_cty r polarity in_process))
-                     |> Option.to_list
-            in
-            match vs @ ps @ rs @ fs with
-            | [] -> extr
-            | x :: xs ->
-              List.fold_left merge x xs
-        end
+        match ty with
+        | CtyOrVar.TyVar tv ->
+          begin match TyVarMap.find_opt tv cty.CompactTypeScheme.rec_vars with
+            | None ->
+              Type.TyVar (tv_of_tyvar tv)
+            | Some t ->
+              go_cty t polarity in_process
+          end
+        | CtyOrVar.Cty { vars; prims; record; fun_ } ->
+          let extr, merge =
+            match polarity with
+            | Polarity.Positive ->
+              Type.Bot, (fun x y -> Type.Union (x, y))
+            | Polarity.Negative ->
+              Type.Top, (fun x y -> Type.Intersection (x, y))
+          in
+          let vs = vars
+                   |> TyVarSet.to_seq
+                   |> Seq.map (fun v -> go (CtyOrVar.TyVar v) polarity in_process)
+                   |> List.of_seq
+          in
+          let ps = prims
+                   |> StringSet.to_seq
+                   |> Seq.map (fun n -> Type.Primitive n)
+                   |> List.of_seq
+          in
+          let rs = record
+                   |> Option.map (fun fs ->
+                       fs
+                       |> StringMap.to_seq
+                       |> Seq.map (fun (n, t) -> (n, go_cty t polarity in_process))
+                       |> List.of_seq
+                       |> (fun x -> Type.Record x))
+                   |> Option.to_list
+          in
+          let fs = fun_
+                   |> Option.map (fun (l, r) ->
+                       Type.Arrow
+                         ( go_cty l (Polarity.negate polarity) in_process
+                         , go_cty r polarity in_process))
+                   |> Option.to_list
+          in
+          match vs @ ps @ rs @ fs with
+          | [] -> extr
+          | x :: xs ->
+            List.fold_left merge x xs
       in
       if !is_recursive then
         Type.Rec (Lazy.force v, res)
