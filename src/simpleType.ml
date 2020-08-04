@@ -136,7 +136,7 @@ let level = function
   | Primitive _ -> 0
   | TyVar { level; _ } -> level
 
-let fresh_var =
+let fresh_tv =
   let count = ref 0 in
   fun level ->
     let uid = !count in
@@ -156,8 +156,8 @@ let record fs =
 let primitive n =
   Primitive n
 
-let ty_var lvl =
-  TyVar (fresh_var lvl)
+let fresh_ty_var lvl =
+  TyVar (fresh_tv lvl)
 
 module O = struct
   let (@->) = arrow

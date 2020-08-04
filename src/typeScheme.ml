@@ -35,7 +35,7 @@ let freshen_above ~limit ty lvl =
         begin match TyVarTbl.find_opt freshened r with
           | Some tv -> tv
           | None ->
-            let nr = SimpleType.fresh_var lvl in
+            let nr = SimpleType.fresh_tv lvl in
             let nv = TyVar nr in
             TyVarTbl.add freshened r nv;
             nr.lower_bounds <- r.lower_bounds |> List.rev_map freshen |> List.rev;

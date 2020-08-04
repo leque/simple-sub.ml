@@ -17,7 +17,7 @@ let int_type = SimpleType.primitive "int"
 
 let builtins =
   let open StringMap in
-  let v = SimpleType.ty_var 1 in
+  let v = SimpleType.fresh_ty_var 1 in
   empty
   |> add "true" @@ TypeScheme.simple bool_type
   |> add "false" @@ TypeScheme.simple bool_type
@@ -48,7 +48,7 @@ let extrude ty polarity lvl =
         begin match TyVarTbl.find_opt cache v with
           | Some v -> v
           | None ->
-            let nr = fresh_var lvl in
+            let nr = fresh_tv lvl in
             let nv = TyVar nr in
             TyVarTbl.add cache v nv;
             begin match polarity with
@@ -137,12 +137,12 @@ let rec type_term term ctx lvl =
         failwith @@ Printf.sprintf "identifier not found: %s" name
     end
   | Lam (name, body) ->
-    let param_ty = SimpleType.ty_var lvl in
+    let param_ty = SimpleType.fresh_ty_var lvl in
     let ctx = StringMap.add name (TypeScheme.simple param_ty) ctx in
     let body_ty = type_term body ctx lvl in
     SimpleType.arrow param_ty body_ty
   | App (f, a) ->
-    let res_ty = SimpleType.ty_var lvl in
+    let res_ty = SimpleType.fresh_ty_var lvl in
     let f_ty = type_term f ctx lvl in
     let a_ty = type_term a ctx lvl in
     constrain f_ty @@ SimpleType.arrow a_ty res_ty;
@@ -150,7 +150,7 @@ let rec type_term term ctx lvl =
   | Int _ ->
     int_type
   | Selection (r, name) ->
-    let res_ty = SimpleType.ty_var lvl in
+    let res_ty = SimpleType.fresh_ty_var lvl in
     let r_ty = type_term r ctx lvl in
     constrain r_ty @@ SimpleType.record [(name, res_ty)];
     res_ty
@@ -163,7 +163,7 @@ let rec type_term term ctx lvl =
 and type_let_rhs is_rec name rhs ctx lvl =
   let res =
     if is_rec then begin
-      let e_ty = SimpleType.ty_var @@ lvl + 1 in
+      let e_ty = SimpleType.fresh_ty_var @@ lvl + 1 in
       let ctx = StringMap.add name (TypeScheme.simple e_ty) ctx in
       let rhs_ty = type_term rhs ctx @@ lvl + 1 in
       constrain rhs_ty e_ty;
@@ -196,7 +196,7 @@ let expand_simple_type st =
         begin match PolarVarTbl.find_opt recursive pv with
           | Some t -> Type.TyVar t
           | None ->
-            let r = tv_of_tyvar (SimpleType.fresh_var 0) in
+            let r = tv_of_tyvar (SimpleType.fresh_tv 0) in
             PolarVarTbl.add recursive pv r;
             Type.TyVar r
         end
@@ -255,7 +255,7 @@ let compact_type st =
             match PolarVarTbl.find_opt recursive pv with
             | Some tv -> tv
             | None ->
-              let res = SimpleType.fresh_var 0 in
+              let res = SimpleType.fresh_tv 0 in
               PolarVarTbl.add recursive pv res;
               res
           in
@@ -442,7 +442,7 @@ let expand_compact_type cty =
         let t =
           match ty with
           | CtyOrVar.TyVar tv -> tv
-          | _ -> SimpleType.fresh_var 0
+          | _ -> SimpleType.fresh_tv 0
         in tv_of_tyvar t
       end
       in

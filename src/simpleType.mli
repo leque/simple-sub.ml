@@ -31,11 +31,11 @@ end
 val pp_bounds : Format.formatter -> t -> unit
 
 val level : t -> int
-val fresh_var : int -> tv
+val fresh_tv : int -> tv
 val arrow : t -> t -> t
 val record : (string * t) list -> t
 val primitive : string -> t
-val ty_var : int -> t
+val fresh_ty_var : int -> t
 
 module O : sig
   val ( @-> ) : t -> t -> t
