@@ -35,13 +35,11 @@ let extrude ty polarity lvl =
       ty
     else
       match ty with
-      | Arrow (lv, l, r) ->
-        Arrow ( lv
-              , recur l (Polarity.negate polarity) lvl
-              , recur r polarity lvl
-              )
-      | Record (lv, fs) ->
-        Record (lv, fs |> List.map (fun (n, t) -> (n, recur t polarity lvl)))
+      | Arrow (_, l, r) ->
+        arrow (recur l (Polarity.negate polarity) lvl)
+              (recur r polarity lvl)
+      | Record (_, fs) ->
+        record (fs |> List.map (fun (n, t) -> (n, recur t polarity lvl)))
       | Primitive _ as t ->
         t
       | TyVar v ->
@@ -49,7 +47,7 @@ let extrude ty polarity lvl =
           | Some v -> v
           | None ->
             let nr = fresh_tv lvl in
-            let nv = TyVar nr in
+            let nv = ty_var nr in
             TyVarTbl.add cache v nv;
             begin match polarity with
               | Positive ->
@@ -299,7 +297,7 @@ let simplify cty =
       Ref.replace all_vars ~f:(RevTyVarSet.add tv);
       let new_occs = SimpleTypeTbl.create 16 in
       let put_seq s = s |> Seq.map (fun x -> x, true) |> SimpleTypeTbl.add_seq new_occs in
-      put_seq (ty.vars |> TyVarSet.to_seq |> Seq.map (fun tv -> SimpleType.TyVar tv));
+      put_seq (ty.vars |> TyVarSet.to_seq |> Seq.map (fun tv -> SimpleType.ty_var tv));
       put_seq (ty.prims |> StringSet.to_seq |> Seq.map SimpleType.primitive);
       let pv = { PolarVar.var = tv; polarity } in
       begin match PolarVarTbl.find_opt co_occs pv with
@@ -378,7 +376,7 @@ let simplify cty =
               && not (TyVarTbl.mem var_subst w)
               && TyVarMap.mem v !rec_vars = TyVarMap.mem w !rec_vars ->
             let b = PolarVarTbl.find_opt co_occs pv
-                    |> Option.map (fun tbl -> SimpleTypeTbl.mem tbl (SimpleType.TyVar v))
+                    |> Option.map (fun tbl -> SimpleTypeTbl.mem tbl (SimpleType.ty_var v))
                     |> Option.value ~default:true
             in
             if b then begin
@@ -394,7 +392,7 @@ let simplify cty =
                 let w_co_occs = PolarVarTbl.find co_occs neg_wpv in
                 let neg_vpv = { PolarVar.var = v; polarity = Polarity.negate pol } in
                 SimpleTypeTbl.filter_map_inplace (fun t x ->
-                    if t == SimpleType.TyVar v || SimpleTypeTbl.mem w_co_occs t then
+                    if t == SimpleType.ty_var v || SimpleTypeTbl.mem w_co_occs t then
                       Some x
                     else
                       None)
@@ -402,7 +400,7 @@ let simplify cty =
             end
           | SimpleType.Primitive _
             when PolarVarTbl.find_opt co_occs { PolarVar.var = v; polarity = Polarity.negate pol }
-                 |> Option.map (fun tbl -> SimpleTypeTbl.mem tbl (SimpleType.TyVar v))
+                 |> Option.map (fun tbl -> SimpleTypeTbl.mem tbl (SimpleType.ty_var v))
                  |> Option.value ~default:false
             ->
             TyVarTbl.add var_subst v None

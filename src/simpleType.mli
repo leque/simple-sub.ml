@@ -1,4 +1,4 @@
-type t =
+type t = private
   | Arrow of int * t * t
   | Record of int * (string * t) list
   | Primitive of string
@@ -32,10 +32,12 @@ val pp_bounds : Format.formatter -> t -> unit
 
 val level : t -> int
 val fresh_tv : int -> tv
+val fresh_ty_var : int -> t
+
 val arrow : t -> t -> t
 val record : (string * t) list -> t
 val primitive : string -> t
-val fresh_ty_var : int -> t
+val ty_var : tv -> t
 
 module O : sig
   val ( @-> ) : t -> t -> t

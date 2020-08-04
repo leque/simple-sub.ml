@@ -156,6 +156,9 @@ let record fs =
 let primitive n =
   Primitive n
 
+let ty_var tv =
+  TyVar tv
+
 let fresh_ty_var lvl =
   TyVar (fresh_tv lvl)
 
