@@ -1,5 +1,3 @@
-open T
-
 let f t =
   let typ = Typer.type_term t Typer.builtins 0 in
   let ty = Typer.expand_simple_type typ in
