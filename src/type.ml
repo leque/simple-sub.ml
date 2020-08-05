@@ -75,12 +75,12 @@ let rec pp_in ppf ctx outer_prec = function
   | Union (l, r) ->
     maybe_paren ppf (outer_prec > union_prec) (fun () ->
         pp_in ppf ctx union_prec l;
-        Format.fprintf ppf " ∧ ";
+        Format.fprintf ppf " ∨ ";
         pp_in ppf ctx union_prec r)
   | Intersection (l, r) ->
     maybe_paren ppf (outer_prec > intersection_prec) (fun () ->
         pp_in ppf ctx intersection_prec l;
-        Format.fprintf ppf " ∨ ";
+        Format.fprintf ppf " ∧ ";
         pp_in ppf ctx intersection_prec r)
 
 let pp ppf t =
