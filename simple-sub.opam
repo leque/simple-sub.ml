@@ -12,4 +12,5 @@ build: [
 depends: [
   "ppx_deriving" {>= "4.5" & < "4.6"}
   "logs" {>= "0.7" & < "0.8"}
+  "menhir" {build & >= "20200624"}
 ]

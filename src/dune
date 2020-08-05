@@ -6,3 +6,8 @@
                ppx_deriving.ord
                ppx_deriving.show
 )))
+
+(ocamllex lexer)
+
+(menhir
+  (modules parser))

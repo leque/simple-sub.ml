@@ -171,6 +171,14 @@ and type_let_rhs is_rec name rhs ctx lvl =
   in
   TypeScheme.poly lvl res
 
+let type_top ?(ctx = builtins) decls =
+  let typs, ctx =
+    List.fold_left (fun (typs, ctx) (is_rec, name, term) ->
+        let ty = type_let_rhs is_rec name term ctx 0 in
+        (name, ty)::typs, StringMap.add name ty ctx)
+      ([], ctx) decls
+  in (List.rev typs, ctx)
+
 module PolarVarTbl = Hashtbl.Make(PolarVar)
 
 let tv_of_tyvar { SimpleType.uid; _ } =

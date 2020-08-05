@@ -10,6 +10,30 @@ let f t =
   Format.printf "simplified: %a\n\n" Type.pp ety;
   ()
 
+let simplify_ty ty =
+  let inst = TypeScheme.instantiate 0 ty in
+  let ct = Typer.compact_type inst in
+  let sct = Typer.simplify ct in
+  let et = Typer.expand_compact_type sct in
+  inst, ct, sct, et
+
+let () =
+  if Array.length Sys.argv > 1 then
+    let in_ch = open_in Sys.argv.(1) in
+    Fun.protect ~finally:(fun () -> close_in in_ch)
+      (fun () ->
+         let lexbuf = Lexing.from_channel in_ch in
+         let parsed = Parser.program Lexer.token lexbuf in
+         let tys, _ctx = Typer.type_top parsed in
+         tys |> List.iter (fun (name, ty) ->
+             let _, _, _, et = simplify_ty ty in
+             Format.printf "val %s : %a\n\n" name Type.pp et
+           ))
+  else
+    (* TODO *)
+    assert false;
+  exit 0
+
 let () =
   Logs.set_reporter (Logs.format_reporter ())
   ; Logs.set_level (Some Logs.Debug)
