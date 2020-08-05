@@ -283,7 +283,8 @@ let compact_type st =
           CompactType.create ~vars:(TyVarSet.singleton v) ()
         | None -> bound
   in
-  { CompactTypeScheme.term = go st Polarity.Positive TyVarSet.empty PolarVarSet.empty
+  let term = go st Polarity.Positive TyVarSet.empty PolarVarSet.empty in
+  { CompactTypeScheme.term
   ; rec_vars = !rec_vars
   }
 
