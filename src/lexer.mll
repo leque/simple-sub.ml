@@ -37,7 +37,7 @@ rule token = parse
     { ELSE }
 | ['0'-'9']+ as n
     { INT (int_of_string n) }
-| ['a'-'z']+ as name
+| ['a'-'z' '_']['a'-'z' '_' '0'-'9']* as name
     { ID name }
 | eof
     { EOF }
