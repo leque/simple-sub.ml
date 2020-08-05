@@ -1,7 +1,11 @@
-let simplify_ty ty =
+let simplify_ty name ty =
+  Logs.debug (fun m -> m "typed `%s` as: %a" name TypeScheme.pp ty);
   let inst = TypeScheme.instantiate 0 ty in
+  Logs.debug (fun m -> m "bounds: %a" SimpleType.pp_bounds inst);
   let ct = Typer.compact_type inst in
+  Logs.debug (fun m -> m "compact type before simplification: %a" CompactTypeScheme.pp ct);
   let sct = Typer.simplify ct in
+  Logs.debug (fun m -> m "compact type after simplification: %a" CompactTypeScheme.pp sct);
   let et = Typer.expand_compact_type sct in
   inst, ct, sct, et
 
@@ -23,7 +27,7 @@ let type_file path =
        let parsed = Parser.program Lexer.token lexbuf in
        let tys, _ctx = Typer.type_top parsed in
        tys |> List.iter (fun (name, ty) ->
-           let _, _, _, et = simplify_ty ty in
+           let _, _, _, et = simplify_ty name ty in
            Format.printf "val %s : %a\n\n" name Type.pp et
          ))
 
@@ -45,7 +49,7 @@ let repl () =
         Buffer.clear buf;
         let tys, ctx = Typer.type_top parsed ~ctx in
         tys |> List.iter (fun (name, ty) ->
-            let _, _, _, et = simplify_ty ty in
+            let _, _, _, et = simplify_ty name ty in
             Format.printf "val %s : %a\n\n" name Type.pp et;
           );
         prompt ();
