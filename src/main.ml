@@ -17,6 +17,16 @@ let simplify_ty ty =
   let et = Typer.expand_compact_type sct in
   inst, ct, sct, et
 
+let string_ends_with ~suffix s =
+  let rec loop i j =
+    if i > j then
+      false
+    else if i < 0 then
+      true
+    else
+      suffix.[i] = s.[j] && loop (i - 1) (j - 1)
+  in loop (String.length suffix - 1) (String.length s - 1)
+
 let () =
   if Array.length Sys.argv > 1 then
     let in_ch = open_in Sys.argv.(1) in
@@ -29,9 +39,37 @@ let () =
              let _, _, _, et = simplify_ty ty in
              Format.printf "val %s : %a\n\n" name Type.pp et
            ))
-  else
-    (* TODO *)
-    assert false;
+  else begin
+    let prompt () =
+      Format.print_string "> ";
+      Format.print_flush ();
+    in
+    let buf = Buffer.create 256 in
+    let rec loop ctx =
+      match input_line stdin with
+      | line ->
+        Buffer.add_string buf line;
+        if string_ends_with ~suffix:";;" line then begin
+          let s = Buffer.contents buf in
+          let s = String.sub s 0 (String.length s - 2) in
+          let lexbuf = Lexing.from_string s in
+          let parsed = Parser.program Lexer.token lexbuf in
+          Buffer.clear buf;
+          let tys, ctx = Typer.type_top parsed ~ctx in
+          tys |> List.iter (fun (name, ty) ->
+              let _, _, _, et = simplify_ty ty in
+              Format.printf "val %s : %a\n\n" name Type.pp et;
+            );
+          prompt ();
+          loop ctx
+        end else
+          loop ctx
+      | exception End_of_file ->
+        ()
+    in
+    prompt ();
+    loop Typer.builtins
+  end;
   exit 0
 
 let () =
