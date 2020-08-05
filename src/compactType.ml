@@ -10,6 +10,36 @@ type t =
   }
 [@@deriving eq, ord]
 
+let rec pp ppf { vars; prims; record; fun_ } =
+  let idx = ref 0 in
+  let print_sep i sep =
+    if !i > 0 then
+      Format.fprintf ppf "%s" sep;
+    incr i
+  in
+  let sep () =
+    print_sep idx ", "
+  in
+  Format.fprintf ppf "<";
+  vars |> TyVarSet.iter (fun tv ->
+      sep ();
+      Format.fprintf ppf "%a" SimpleType.TyVar.pp tv);
+  prims |> StringSet.iter (fun s ->
+      sep ();
+      Format.fprintf ppf "%s" s);
+  record |> Option.iter (fun fs ->
+      sep ();
+      Format.fprintf ppf "{";
+      let i = ref 0 in
+      fs |> StringMap.iter (fun name t ->
+          print_sep i "; ";
+          Format.fprintf ppf "%s: %a" name pp t);
+      Format.fprintf ppf "}");
+  fun_ |> Option.iter (fun (l, r) ->
+      sep ();
+      Format.fprintf ppf "%a -> %a" pp l pp r);
+  Format.fprintf ppf ">"
+
 let create ?(vars = TyVarSet.empty) ?(prims = StringSet.empty) ?record ?fun_ () =
   { vars; prims; record; fun_ }
 
