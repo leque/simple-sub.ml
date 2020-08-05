@@ -23,6 +23,7 @@ let builtins =
   |> add "false" @@ TypeScheme.simple bool_type
   |> add "not" @@ TypeScheme.simple SimpleType.O.(bool_type @-> bool_type)
   |> add "succ" @@ TypeScheme.simple SimpleType.O.(int_type @-> int_type)
+  |> add "add" @@ TypeScheme.simple SimpleType.O.(int_type @-> int_type @-> int_type)
   |> add "if" @@ TypeScheme.poly 0 @@ SimpleType.O.(bool_type @-> v @-> v @-> v)
 
 let extrude ty polarity lvl =
