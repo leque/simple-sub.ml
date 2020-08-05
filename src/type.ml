@@ -67,7 +67,7 @@ let rec pp_in ppf ctx outer_prec = function
     Format.fprintf ppf "{";
     fs |> List.iteri (fun i (n, t) ->
         if i > 0 then
-            Format.fprintf ppf ", ";
+            Format.fprintf ppf "; ";
         Format.fprintf ppf "%s: " n;
         pp_in ppf ctx 0 t;
       );

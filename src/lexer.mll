@@ -15,8 +15,6 @@ rule token = parse
     { RBRACE }
 | "."
     { DOT }
-| ","
-    { COMMA }
 | ";"
     { SEMI }
 | "let"

@@ -15,7 +15,6 @@ let make_fun args body =
 %token LET REC IN
 %token EQL
 %token SEMI
-%token COMMA
 %token DOT
 %token LBRACE RBRACE
 %token LPAREN RPAREN
@@ -63,7 +62,7 @@ prim_expr:
     { e }
 
 record:
-  LBRACE; fs = separated_list(COMMA, field); RBRACE
+  LBRACE; fs = separated_list(SEMI, field); RBRACE
     { Term.Record fs }
 
 field:
