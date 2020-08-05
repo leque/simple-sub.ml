@@ -293,7 +293,7 @@ module RevTyVarSet = Set.Make(struct
     let compare x y = -(compare x y)
   end)
 
-let simplify cty =
+let simplify_compact_type cty =
   let all_vars =
     RevTyVarSet.empty
     |> RevTyVarSet.add_seq (TyVarMap.to_seq cty.CompactTypeScheme.rec_vars |> Seq.map fst)

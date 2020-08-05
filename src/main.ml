@@ -4,7 +4,7 @@ let simplify_ty name ty =
   Logs.debug (fun m -> m "bounds: %a" SimpleType.pp_bounds inst);
   let ct = Typer.compact_type inst in
   Logs.debug (fun m -> m "compact type before simplification: %a" CompactTypeScheme.pp ct);
-  let sct = Typer.simplify ct in
+  let sct = Typer.simplify_compact_type ct in
   Logs.debug (fun m -> m "compact type after simplification: %a" CompactTypeScheme.pp sct);
   let et = Typer.expand_compact_type sct in
   inst, ct, sct, et
