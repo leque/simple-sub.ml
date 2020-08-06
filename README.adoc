@@ -2,3 +2,41 @@
 
 An OCaml port of Lionel Parreaux's link:https://github.com/LPTK/simple-sub[simple-sub]
 type inference implementation.
+
+== usage
+
+=== type-check a file
+
+[console]
+----
+% dune exec main examples/ss.ml
+val id : 'a -> 'a
+
+val twice : ('a ∨ 'b -> 'a) -> 'b -> 'a
+
+val object1 : {x: int; y: 'a -> 'a}
+
+val object2 : {x: int; y: bool}
+
+val pick_an_object : bool -> {x: int; y: bool ∨ ('a -> 'a)}
+
+val produce : int -> {head: int; tail: 'a} as 'a
+
+val consume : {head: int; tail: 'a} as 'a -> int
+
+----
+
+=== type-check interactively via repl
+
+[console]
+----
+% dune exec main
+> let f x = x x;;
+val f : 'b ∧ ('b -> 'a) -> 'a
+
+>
+----
+
+== Limitations
+
+* No error handling are implemented. Parse errors and type errors offer almost no useful information.
