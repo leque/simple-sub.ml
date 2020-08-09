@@ -11,3 +11,8 @@ let opt_merge ~f a b =
   | Some _, _ -> a
   | _, Some _ -> b
   | _, _ -> None
+
+let opt_zip_with ~f a b =
+  match a, b with
+  | Some a, Some b -> Some (f a b)
+  | _, _ -> None
