@@ -49,10 +49,10 @@ let empty =
 let rec merge polarity a b =
   let vars = a.vars |> TyVarSet.add_seq (TyVarSet.to_seq b.vars) in
   let prims = a.prims |> StringSet.add_seq (StringSet.to_seq b.prims) in
-  let record = U.merge_opt a.record b.record ~f:begin fun lhs rhs ->
+  let record = U.opt_merge a.record b.record ~f:begin fun lhs rhs ->
       match polarity with
       | Polarity.Negative ->
-        StringMap.merge (fun _ l r -> U.merge_opt ~f:(merge polarity) l r) lhs rhs
+        StringMap.merge (fun _ l r -> U.opt_merge ~f:(merge polarity) l r) lhs rhs
       | Positive ->
         StringMap.merge (fun _k l r ->
             match l, r with
@@ -62,7 +62,7 @@ let rec merge polarity a b =
           ) lhs rhs
     end
   in
-  let fun_ = U.merge_opt a.fun_ b.fun_ ~f:(fun (l0, r0) (l1, r1) ->
+  let fun_ = U.opt_merge a.fun_ b.fun_ ~f:(fun (l0, r0) (l1, r1) ->
       merge (Polarity.negate polarity) l0 l1, merge polarity r0 r1)
   in
   { vars; prims; record; fun_ }

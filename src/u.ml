@@ -5,7 +5,7 @@ module Ref = struct
     t := f !t
 end
 
-let merge_opt ~f a b =
+let opt_merge ~f a b =
   match a, b with
   | Some a, Some b -> Some (f a b)
   | Some _, _ -> a
