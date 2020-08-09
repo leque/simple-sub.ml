@@ -37,7 +37,7 @@ let freshen_above ~limit ty lvl =
           | None ->
             let nr = SimpleType.fresh_tv lvl in
             let nv = SimpleType.ty_var nr in
-            TyVarTbl.add freshened r nv;
+            TyVarTbl.replace freshened r nv;
             nr.lower_bounds <- r.lower_bounds |> List.rev_map freshen |> List.rev;
             nr.upper_bounds <- r.upper_bounds |> List.rev_map freshen |> List.rev;
             nv

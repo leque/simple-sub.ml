@@ -49,7 +49,7 @@ let extrude ty polarity lvl =
           | None ->
             let nr = fresh_tv lvl in
             let nv = ty_var nr in
-            TyVarTbl.add cache v nv;
+            TyVarTbl.replace cache v nv;
             begin match polarity with
               | Positive ->
                 v.upper_bounds <- nv :: v.upper_bounds;
@@ -204,7 +204,7 @@ let expand_simple_type st =
           | Some t -> Type.TyVar t
           | None ->
             let r = tv_of_tyvar (SimpleType.fresh_tv 0) in
-            PolarVarTbl.add recursive pv r;
+            PolarVarTbl.replace recursive pv r;
             Type.TyVar r
         end
       else begin
@@ -263,7 +263,7 @@ let compact_type st =
             | Some tv -> tv
             | None ->
               let res = SimpleType.fresh_tv 0 in
-              PolarVarTbl.add recursive pv res;
+              PolarVarTbl.replace recursive pv res;
               res
           in
           let vars = TyVarSet.singleton v in
@@ -312,7 +312,7 @@ let simplify_compact_type cty =
       let pv = { PolarVar.var = tv; polarity } in
       begin match PolarVarTbl.find_opt co_occs pv with
         | None ->
-          PolarVarTbl.add co_occs pv new_occs
+          PolarVarTbl.replace co_occs pv new_occs
         | Some os ->
           os |> SimpleTypeTbl.filter_map_inplace (fun k v ->
               if SimpleTypeTbl.mem new_occs k then
@@ -368,7 +368,7 @@ let simplify_compact_type cty =
       match PolarVarTbl.find_opt co_occs pos, PolarVarTbl.find_opt co_occs neg with
       | Some _, None
       | None, Some _ ->
-        TyVarTbl.add var_subst v0 None
+        TyVarTbl.replace var_subst v0 None
       | Some _, Some _ -> ()
       | None, None -> assert false
     end
@@ -390,7 +390,7 @@ let simplify_compact_type cty =
                     |> Option.value ~default:true
             in
             if b then begin
-              TyVarTbl.add var_subst w (Some v);
+              TyVarTbl.replace var_subst w (Some v);
               match TyVarMap.find_opt w !rec_vars with
               | Some bw ->
                 Ref.replace rec_vars ~f:(TyVarMap.remove w);
@@ -413,7 +413,7 @@ let simplify_compact_type cty =
                  |> Option.map (fun tbl -> SimpleTypeTbl.mem tbl (SimpleType.ty_var v))
                  |> Option.value ~default:false
             ->
-            TyVarTbl.add var_subst v None
+            TyVarTbl.replace var_subst v None
           | _ ->
             ()
         end
