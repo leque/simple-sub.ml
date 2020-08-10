@@ -25,8 +25,7 @@ let make_fun args body =
 
 %type<(bool * string * Term.t) list> program
 %type<bool * string * Term.t> declaration
-%type<Term.t> expr prim_expr
-%type<Term.t> record
+%type<Term.t> expr prim_expr record
 %type<string * Term.t> field
 
 %%
@@ -36,7 +35,7 @@ program:
     { $1 }
 
 declaration:
-    LET is_rec = boption(REC) name = ID params = ID* EQL body = expr SEMI?
+    LET; is_rec = boption(REC); name = ID; params = ID*; EQL; body = expr; SEMI?
     { (is_rec, name, make_fun params body) }
 
 expr:
@@ -47,7 +46,7 @@ expr:
   | IF; c = expr; THEN; t = expr; ELSE; e = expr
     { Term.O.(v"if" $ c $ t $ e) }
   | app = prim_expr+
-    { make_app (app) }
+    { make_app app }
 
 prim_expr:
     r = record
