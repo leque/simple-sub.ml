@@ -18,7 +18,7 @@ module Var = struct
     { name_hint : string
     ; uid : int
     }
-  [@@deriving eq, ord]
+  [@@deriving ord]
 end
 
 module VarMap = Map.Make(Var)

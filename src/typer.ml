@@ -428,12 +428,12 @@ module CtyOrVar = struct
   type t =
     | Cty of CompactType.t
     | TyVar of TyVar.t
-  [@@deriving eq, ord]
+  [@@deriving ord]
 end
 
 module PCty = struct
   type t = { ty : CtyOrVar.t; polarity : Polarity.t }
-  [@@deriving eq, ord]
+  [@@deriving ord]
 end
 
 module PCtyMap = Map.Make(PCty)

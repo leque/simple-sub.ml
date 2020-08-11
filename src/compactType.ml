@@ -43,9 +43,6 @@ let rec pp ppf { vars; prims; record; fun_ } =
 let create ?(vars = TyVarSet.empty) ?(prims = StringSet.empty) ?record ?fun_ () =
   { vars; prims; record; fun_ }
 
-let empty =
-  create ()
-
 let rec merge polarity a b =
   let vars = a.vars |> TyVarSet.add_seq (TyVarSet.to_seq b.vars) in
   let prims = a.prims |> StringSet.add_seq (StringSet.to_seq b.prims) in
