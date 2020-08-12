@@ -51,7 +51,7 @@ let rec merge polarity a b =
       | Polarity.Negative ->
         StringMap.merge (fun _ l r -> U.opt_merge ~f:(merge polarity) l r) lhs rhs
       | Positive ->
-        StringMap.merge (fun _ l r -> U.opt_zip_with ~f:(merge polarity) l r) lhs rhs
+        StringMap.merge (fun _ l r -> U.opt_map2 ~f:(merge polarity) l r) lhs rhs
     end
   in
   let fun_ = U.opt_merge a.fun_ b.fun_ ~f:(fun (l0, r0) (l1, r1) ->
